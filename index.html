@@ -3,46 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Moms World | Official Store</title>
+    <title>Moms World | Admin Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .moms-pink { color: #e91e63; }
         .bg-moms-pink { background-color: #e91e63; }
-        .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes pop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-40 text-slate-800 font-sans">
-
-    <div id="welcome-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-6">
-        <div class="bg-white w-full max-w-xs rounded-[3rem] p-8 text-center animate-pop shadow-2xl relative">
-            <button onclick="closeWelcome()" class="absolute top-4 right-6 text-slate-300 hover:text-slate-900"><i class="fa-solid fa-xmark"></i></button>
-            <div class="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa-solid fa-gift moms-pink text-2xl"></i>
-            </div>
-            <h2 class="text-xl font-black mb-2 italic">Special Offer! ✨</h2>
-            <p class="text-[11px] text-slate-500 leading-relaxed mb-6">Welcome to Moms World! Use code <span class="font-bold text-slate-900 tracking-widest">MOM10</span> on WhatsApp for <span class="moms-pink font-bold">Free Shipping</span> on your first order!</p>
-            <button onclick="closeWelcome()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest active:scale-95 transition-all shadow-lg">Start Shopping</button>
-        </div>
-    </div>
-
-    <a id="support-btn" href="https://wa.me/918309401083?text=Hi%20Moms%20World!%20I%20have%20a%20question..." target="_blank" 
-       class="hidden fixed bottom-28 right-6 z-[60] bg-green-500 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center animate-bounce">
-        <i class="fa-brands fa-whatsapp text-3xl"></i>
-    </a>
 
     <header class="bg-white border-b sticky top-0 z-50 px-4 py-3 shadow-sm">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <img src="moms logo.png" onerror="this.src='https://ui-avatars.com/api/?name=Moms+World&background=e91e63&color=fff'" class="h-10 w-10 rounded-full object-cover border">
                 <div>
-                    <h1 class="font-black text-sm uppercase text-slate-900 leading-none tracking-tighter">Moms World</h1>
-                    <p class="text-[8px] font-bold moms-pink uppercase tracking-widest mt-1">India's Premium Boutique</p>
+                    <h1 class="font-black text-sm uppercase text-slate-900 leading-none">Moms World</h1>
+                    <p class="text-[8px] font-bold moms-pink uppercase tracking-widest mt-1">Admin Dashboard</p>
                 </div>
             </div>
         </div>
@@ -55,84 +37,83 @@
                 <div class="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mx-auto">
                     <i class="fa-solid fa-lock moms-pink text-2xl"></i>
                 </div>
-                <h2 class="text-xl font-black">Admin Access</h2>
+                <h2 class="text-xl font-black">Verify Identity</h2>
                 <input type="password" id="admin-pin" maxlength="4" placeholder="••••" class="w-32 text-center text-2xl font-black tracking-[1rem] p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-pink-400">
-                <button onclick="checkPin()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-xs">Unlock Inventory</button>
+                <button onclick="checkPin()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-xs">Login</button>
             </div>
         </section>
 
         <div id="tab-container" class="flex bg-slate-200 p-1 rounded-2xl">
-            <button onclick="switchTab('admin')" id="tab-admin" class="flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm text-slate-900">Inventory</button>
-            <button onclick="switchTab('store')" id="tab-store" class="flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500">Live Store</button>
+            <button onclick="switchTab('admin')" id="tab-admin" class="flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm text-slate-900">Manage Stock</button>
+            <button onclick="switchTab('store')" id="tab-store" class="flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500">View Store</button>
         </div>
 
         <div id="view-admin" class="hidden space-y-6">
-            <div id="edit-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center z-[70] p-6">
-                <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 space-y-4 animate-pop shadow-2xl">
-                    <h3 class="font-black text-xs uppercase tracking-widest text-slate-400">Edit Product</h3>
+            
+            <div id="edit-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center z-[100] p-6">
+                <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 space-y-4 animate-pop shadow-2xl overflow-y-auto max-h-[90vh] no-scrollbar">
+                    <h3 class="font-black text-xs uppercase tracking-widest text-slate-400 mb-2">Edit Item Details</h3>
                     <input type="hidden" id="edit-id">
-                    <input type="text" id="edit-name" placeholder="Name" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
-                    <input type="number" id="edit-price" placeholder="Price (₹)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
-                    <div class="flex gap-2">
-                        <button onclick="closeEdit()" class="flex-1 py-4 text-slate-400 font-bold uppercase text-[10px]">Back</button>
-                        <button onclick="saveEdit()" id="btn-save-edit" class="flex-1 bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-[10px]">Save</button>
+                    <div class="space-y-3">
+                        <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Product Name</label>
+                        <input type="text" id="edit-name" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-pink-400">
+                        
+                        <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Price (₹)</label>
+                        <input type="number" id="edit-price" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-pink-400">
+                        
+                        <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Category</label>
+                        <input type="text" id="edit-category" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-pink-400">
+                        
+                        <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Available Sizes (Comma separated)</label>
+                        <input type="text" id="edit-sizes" placeholder="S, M, L, XL" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-pink-400">
+                    </div>
+                    <div class="flex gap-2 pt-4">
+                        <button onclick="closeEdit()" class="flex-1 py-4 text-slate-400 font-bold uppercase text-[10px]">Cancel</button>
+                        <button onclick="saveEdit()" id="btn-save-edit" class="flex-1 bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-[10px]">Update Item</button>
                     </div>
                 </div>
             </div>
 
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+                <input type="text" id="admin-search" oninput="renderUI()" placeholder="Search your stock..." class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl outline-none text-xs">
+            </div>
+
             <div id="admin-inventory" class="space-y-3 bg-white p-4 rounded-3xl border shadow-sm"></div>
-
-            <section class="bg-indigo-50 p-6 rounded-[2.5rem] border border-indigo-100 shadow-sm animate-pop">
-                <h3 class="text-[10px] font-black uppercase mb-2 text-indigo-400">Bulk Stock Import</h3>
-                <textarea id="bulk-input" rows="3" placeholder="Name, Price, Category, Sizes" 
-                    class="w-full p-4 bg-white border border-indigo-200 rounded-2xl outline-none text-xs font-mono mb-3 no-scrollbar"></textarea>
-                <button onclick="processBulk()" id="btn-bulk" class="w-full bg-indigo-600 text-white font-black py-3 rounded-2xl uppercase tracking-widest text-[9px]">Add List to Cloud</button>
-            </section>
-
-            <section class="bg-white p-6 rounded-[2.5rem] border shadow-sm space-y-3">
-                <h3 class="text-[10px] font-black uppercase text-slate-400">Add New Arrival</h3>
-                <input type="text" id="p-name" placeholder="Name" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
-                <input type="number" id="p-price" placeholder="Price (₹)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
-                <input type="file" id="p-img" accept="image/*" class="w-full text-xs p-2" onchange="previewFile(event)">
-                <button onclick="uploadProduct()" id="btn-pub" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-xs active:scale-95">Publish Item</button>
-            </section>
-        </div>
-
-        <div id="view-store" class="hidden space-y-10 animate-pop">
-            <div id="store-grid" class="grid grid-cols-2 gap-4"></div>
-
-            <section class="space-y-4 pb-10">
-                <h3 class="text-center font-black text-[9px] uppercase tracking-[0.3em] text-slate-300">Loved by Moms</h3>
-                <div class="flex gap-4 overflow-x-auto no-scrollbar py-2">
-                    <div class="min-w-[280px] bg-white p-8 rounded-[3rem] border italic text-[12px] text-slate-600 shadow-sm">
-                        "The frocks are just beautiful! The fabric is so soft for my newborn. Highly recommend Moms World."
-                        <p class="not-italic font-black mt-4 text-slate-900 text-[9px] uppercase tracking-wider">— Sravani, Vijayawada</p>
+            
+            <section class="bg-white p-6 rounded-[2.5rem] border shadow-sm space-y-4">
+                <h3 class="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2"><i class="fa-solid fa-plus moms-pink"></i> Add New Product</h3>
+                <div class="space-y-3">
+                    <input type="text" id="p-name" placeholder="Product Name" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
+                    <div class="flex gap-2">
+                        <input type="number" id="p-price" placeholder="Price (₹)" class="flex-1 p-4 bg-slate-50 border rounded-2xl outline-none">
+                        <input type="text" id="p-category" placeholder="Category" class="flex-1 p-4 bg-slate-50 border rounded-2xl outline-none">
                     </div>
-                    <div class="min-w-[280px] bg-white p-8 rounded-[3rem] border italic text-[12px] text-slate-600 shadow-sm">
-                        "Ordered for my son's first birthday. Everyone loved the quality. Quick delivery too!"
-                        <p class="not-italic font-black mt-4 text-slate-900 text-[9px] uppercase tracking-wider">— Rahul, Tirupati</p>
+                    <input type="text" id="p-sizes" placeholder="Sizes (e.g. S, M, L)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
+                    
+                    <label class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition">
+                        <i class="fa-solid fa-camera text-xl text-slate-300 mb-1"></i>
+                        <span class="text-[9px] font-bold uppercase text-slate-400">Add Product Photo</span>
+                        <input type="file" id="p-img" accept="image/*" class="hidden" onchange="handleFile(event)">
+                    </label>
+                    <div id="preview-box" class="hidden relative h-32 rounded-2xl overflow-hidden border">
+                        <img id="img-prev" class="w-full h-full object-cover">
                     </div>
+
+                    <button onclick="uploadProduct()" id="btn-pub" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-xs active:scale-95 transition-all">Publish to Store</button>
                 </div>
             </section>
         </div>
-    </main>
 
-    <div id="cart-drawer" class="fixed bottom-24 left-4 right-4 bg-slate-900 text-white p-6 rounded-[2.5rem] shadow-2xl hidden z-50 animate-pop border border-slate-700">
-        <div class="flex justify-between items-center mb-4 px-2">
-            <h3 class="font-black text-[10px] uppercase tracking-widest moms-pink italic">Shopping Bag</h3>
-            <button onclick="cart=[]; updateCartUI()" class="text-[9px] uppercase font-bold opacity-30">Clear</button>
+        <div id="view-store" class="hidden space-y-6 animate-pop">
+            <div id="store-grid" class="grid grid-cols-2 gap-4"></div>
         </div>
-        <div id="cart-items" class="max-h-40 overflow-y-auto mb-4 space-y-3 text-[11px] no-scrollbar px-1"></div>
-        <div class="border-t border-slate-700 pt-4 flex justify-between items-center px-2">
-            <div><p class="text-[9px] opacity-40 uppercase font-bold mb-1">Subtotal</p><p class="text-xl font-black" id="cart-total">₹0</p></div>
-            <button onclick="checkoutWA()" class="bg-moms-pink text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all">WhatsApp Order</button>
-        </div>
-    </div>
+    </main>
 
     <nav class="fixed bottom-0 left-0 right-0 glass-nav border-t p-4 z-50">
         <div class="max-w-md mx-auto flex justify-around items-center text-slate-400">
-            <button onclick="switchTab('admin')" id="nav-admin" class="flex flex-col items-center gap-1 active:text-slate-900"><i class="fa-solid fa-box-open text-xl"></i><span class="text-[9px] font-bold uppercase">Admin</span></button>
-            <button onclick="copyLink()" class="flex flex-col items-center gap-1"><i class="fa-solid fa-share-nodes text-xl"></i><span class="text-[9px] font-bold uppercase">Share</span></button>
+            <button onclick="switchTab('admin')" id="nav-admin" class="flex flex-col items-center gap-1"><i class="fa-solid fa-sliders text-xl"></i><span class="text-[9px] font-bold uppercase">Admin</span></button>
+            <button onclick="copyLink()" class="flex flex-col items-center gap-1"><i class="fa-solid fa-share-nodes text-xl"></i><span class="text-[9px] font-bold uppercase">Share Store</span></button>
         </div>
     </nav>
 
@@ -141,23 +122,17 @@
         const SUPABASE_KEY = 'sb_publishable_HaDa8rT3A4_l2E9DhzpGwQ_wJYDBNzO'; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const MASTER_PIN = '9490'; 
-        const MY_NUM = '918309401083'; // Replace with your WhatsApp Number
-
+        const MASTER_PIN = '1234'; 
         let isAdminAuthenticated = false;
         let products = [];
-        let cart = [];
         let selectedFile = null;
 
         window.onload = () => {
             fetchProducts();
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('view') === 'store') {
+            if (new URLSearchParams(window.location.search).get('view') === 'store') {
                 document.getElementById('tab-container').style.display = 'none';
                 document.getElementById('nav-admin').style.display = 'none';
                 switchTab('store');
-                // SHOW POPUP ONLY FOR CUSTOMERS
-                setTimeout(() => { document.getElementById('welcome-modal').className = "fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 animate-pop"; }, 1500);
             } else { switchTab('admin'); }
         };
 
@@ -174,98 +149,87 @@
             } else { alert("Wrong PIN!"); document.getElementById('admin-pin').value = ''; }
         }
 
-        // EDITING
+        // FULL CONTROL EDITING
         function openEdit(id) {
             const p = products.find(i => i.id === id);
             document.getElementById('edit-id').value = p.id;
             document.getElementById('edit-name').value = p.name;
             document.getElementById('edit-price').value = p.price;
+            document.getElementById('edit-category').value = p.category || '';
+            document.getElementById('edit-sizes').value = p.sizes || '';
+            
             document.getElementById('edit-modal').classList.remove('hidden');
             document.getElementById('edit-modal').classList.add('flex');
         }
+
         function closeEdit() { document.getElementById('edit-modal').classList.add('hidden'); document.getElementById('edit-modal').classList.remove('flex'); }
+
         async function saveEdit() {
             const id = document.getElementById('edit-id').value;
-            const name = document.getElementById('edit-name').value;
-            const price = parseFloat(document.getElementById('edit-price').value);
-            await supabaseClient.from('products').update({ name, price }).eq('id', id);
-            closeEdit(); fetchProducts();
-        }
+            const updates = {
+                name: document.getElementById('edit-name').value,
+                price: parseFloat(document.getElementById('edit-price').value),
+                category: document.getElementById('edit-category').value,
+                sizes: document.getElementById('edit-sizes').value
+            };
+            
+            const btn = document.getElementById('btn-save-edit');
+            btn.innerText = "UPDATING..."; btn.disabled = true;
 
-        async function deleteProduct(id) { if(confirm("Delete permanently?")) { await supabaseClient.from('products').delete().eq('id', id); fetchProducts(); } }
+            const { error } = await supabaseClient.from('products').update(updates).eq('id', id);
+            if (error) alert("Edit Failed: " + error.message);
+            else { closeEdit(); fetchProducts(); }
+            btn.innerText = "Update Item"; btn.disabled = false;
+        }
 
         async function uploadProduct() {
             const name = document.getElementById('p-name').value;
             const price = document.getElementById('p-price').value;
-            if (!name || !price || !selectedFile) return alert("Photo and details missing!");
-            const btn = document.getElementById('btn-pub'); btn.disabled = true; btn.innerText = "UPLOADING...";
+            const category = document.getElementById('p-category').value;
+            const sizes = document.getElementById('p-sizes').value;
+            
+            if (!name || !price || !selectedFile) return alert("Fill Name, Price and add Photo!");
+            const btn = document.getElementById('btn-pub'); btn.disabled = true; btn.innerText = "PUBLISHING...";
 
             const fName = `${Date.now()}-${selectedFile.name.replace(/\s/g, '_')}`;
             const { error: uErr } = await supabaseClient.storage.from('product-images').upload(fName, selectedFile);
             if (uErr) { alert("Upload Failed!"); btn.disabled = false; return; }
 
             const { data: { publicUrl } } = supabaseClient.storage.from('product-images').getPublicUrl(fName);
-            await supabaseClient.from('products').insert([{ name, price: parseFloat(price), image_url: publicUrl }]);
+            await supabaseClient.from('products').insert([{ name, price: parseFloat(price), category, sizes, image_url: publicUrl }]);
             location.reload();
         }
 
-        async function processBulk() {
-            const input = document.getElementById('bulk-input').value.trim();
-            const btn = document.getElementById('btn-bulk');
-            if (!input) return; btn.disabled = true; btn.innerText = "ADDING...";
-            const lines = input.split('\n');
-            const toUpload = lines.map(line => {
-                const p = line.split(',');
-                return { name: p[0]?.trim(), price: parseFloat(p[1]?.trim()) || 0, image_url: 'https://ui-avatars.com/api/?name=Stock&background=e91e63&color=fff' };
-            }).filter(i => i.name);
-            await supabaseClient.from('products').insert(toUpload);
-            location.reload();
-        }
+        async function deleteProduct(id) { if(confirm("Delete this item?")) { await supabaseClient.from('products').delete().eq('id', id); fetchProducts(); } }
 
         function renderUI() {
-            document.getElementById('admin-inventory').innerHTML = products.map(p => `
-                <div class="flex items-center justify-between p-2 border-b last:border-0 border-slate-50">
-                    <div class="flex items-center gap-3">
-                        <img src="${p.image_url}" class="w-8 h-8 rounded-lg object-cover">
-                        <p class="text-[10px] font-bold uppercase truncate w-24">${p.name} • ₹${p.price}</p>
+            const query = document.getElementById('admin-search')?.value.toLowerCase() || "";
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
+
+            document.getElementById('admin-inventory').innerHTML = filtered.map(p => `
+                <div class="flex items-center justify-between p-3 border-b last:border-0 border-slate-50 animate-pop">
+                    <div class="flex items-center gap-4">
+                        <img src="${p.image_url}" class="w-10 h-10 rounded-xl object-cover border shadow-sm">
+                        <div class="min-w-0">
+                            <p class="text-[10px] font-black uppercase truncate w-32">${p.name}</p>
+                            <p class="text-[9px] moms-pink font-bold">₹${p.price} | ${p.category || 'No Category'}</p>
+                        </div>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="openEdit('${p.id}')" class="text-indigo-400 p-2"><i class="fa-solid fa-pencil text-[10px]"></i></button>
-                        <button onclick="deleteProduct('${p.id}')" class="text-red-300 p-2"><i class="fa-solid fa-trash-can text-[10px]"></i></button>
+                        <button onclick="openEdit('${p.id}')" class="bg-slate-50 text-indigo-400 p-2.5 rounded-xl"><i class="fa-solid fa-pencil text-xs"></i></button>
+                        <button onclick="deleteProduct('${p.id}')" class="bg-slate-50 text-red-300 p-2.5 rounded-xl"><i class="fa-solid fa-trash-can text-xs"></i></button>
                     </div>
                 </div>`).join('');
             
             document.getElementById('store-grid').innerHTML = products.map(p => `
-                <div class="bg-white rounded-[2rem] border overflow-hidden relative shadow-sm animate-pop">
+                <div class="bg-white rounded-[2.5rem] border overflow-hidden relative shadow-sm animate-pop">
                     <img src="${p.image_url}" class="w-full h-40 object-cover">
                     <div class="p-4 text-center">
                         <h3 class="font-black text-[9px] uppercase tracking-tighter mb-1 truncate px-2 text-slate-700">${p.name}</h3>
                         <p class="moms-pink font-black text-xs mb-3 font-serif">₹${p.price}</p>
-                        <button onclick="addToBag('${p.id}')" class="w-full bg-slate-900 text-white py-2.5 rounded-2xl text-[8px] font-black uppercase tracking-widest shadow-md active:scale-95 transition-all">Add to bag</button>
+                        <button class="w-full bg-slate-900 text-white py-2.5 rounded-2xl text-[8px] font-black uppercase tracking-widest active:scale-95 transition-all">Add to bag</button>
                     </div>
                 </div>`).join('');
-        }
-
-        function addToBag(id) { cart.push(products.find(i => i.id === id)); updateCartUI(); }
-
-        function updateCartUI() {
-            const dr = document.getElementById('cart-drawer');
-            if(cart.length === 0) { dr.classList.add('hidden'); return; }
-            dr.classList.remove('hidden');
-            let total = cart.reduce((acc, i) => acc + i.price, 0);
-            document.getElementById('cart-items').innerHTML = cart.map((i, idx) => `
-                <div class="flex justify-between items-center text-white">
-                    <span>${i.name}</span><button onclick="cart.splice(${idx},1); updateCartUI()" class="text-pink-500 font-bold p-1">Remove</button>
-                </div>`).join('');
-            document.getElementById('cart-total').innerText = `₹${total}`;
-        }
-
-        function checkoutWA() {
-            let total = cart.reduce((acc, i) => acc + i.price, 0);
-            let msg = `🛍️ *MOMS WORLD ORDER*\n━━━━━━━━━━━━━━━\n`;
-            cart.forEach(i => msg += `• ${i.name} - ₹${i.price}\n`);
-            msg += `━━━━━━━━━━━━━━━\n💰 *Total: ₹${total}*`;
-            window.open(`https://wa.me/${MY_NUM}?text=${encodeURIComponent(msg)}`);
         }
 
         function switchTab(t) {
@@ -273,23 +237,31 @@
             document.getElementById('admin-login').classList.add('hidden');
             document.getElementById('view-admin').classList.add('hidden');
             document.getElementById('view-store').classList.add('hidden');
-            const support = document.getElementById('support-btn');
 
             if (isAd) {
                 if (isAdminAuthenticated) document.getElementById('view-admin').classList.remove('hidden');
                 else document.getElementById('admin-login').classList.remove('hidden');
-                support.classList.add('hidden');
             } else {
                 document.getElementById('view-store').classList.remove('hidden');
-                support.classList.remove('hidden');
             }
-            document.getElementById('tab-admin').className = isAd ? "flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm" : "flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500";
-            document.getElementById('tab-store').className = !isAd ? "flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm" : "flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500";
+            document.getElementById('tab-admin').className = isAd ? "flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm text-slate-900" : "flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500";
+            document.getElementById('tab-store').className = !isAd ? "flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm text-slate-900" : "flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500";
         }
 
-        function previewFile(e) { selectedFile = e.target.files[0]; }
-        function closeWelcome() { document.getElementById('welcome-modal').className = "hidden"; }
-        function copyLink() { navigator.clipboard.writeText(window.location.origin + window.location.pathname + '?view=store'); alert("Professional Store Link Copied!"); }
+        function handleFile(e) { 
+            selectedFile = e.target.files[0]; 
+            const reader = new FileReader();
+            reader.onload = (f) => { 
+                document.getElementById('img-prev').src = f.target.result; 
+                document.getElementById('preview-box').classList.remove('hidden'); 
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+
+        function copyLink() { 
+            navigator.clipboard.writeText(window.location.origin + window.location.pathname + '?view=store'); 
+            alert("Customer Link Copied!"); 
+        }
     </script>
 </body>
 </html>
