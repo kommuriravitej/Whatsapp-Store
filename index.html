@@ -22,6 +22,9 @@
         input:checked + .slider:before { transform: translateX(14px); }
         .filter-btn.active { background-color: #e91e63; color: white; border-color: #e91e63; }
         .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        
+        /* Dropdown Styling */
+        select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-44 text-slate-800 font-sans">
@@ -74,7 +77,6 @@
         </div>
 
         <div id="view-admin" class="hidden space-y-6">
-            
             <div id="edit-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center z-[100] p-6">
                 <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 space-y-4 animate-pop shadow-2xl overflow-y-auto max-h-[90vh] no-scrollbar">
                     <h3 class="font-black text-xs uppercase tracking-widest text-slate-400">Edit Product</h3>
@@ -113,7 +115,7 @@
                         <input type="number" id="p-price" placeholder="Price (₹)" class="flex-1 p-4 bg-slate-50 border rounded-2xl outline-none">
                         <input type="text" id="p-category" placeholder="Category" class="flex-1 p-4 bg-slate-50 border rounded-2xl outline-none">
                     </div>
-                    <input type="text" id="p-sizes" placeholder="Available Sizes" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
+                    <input type="text" id="p-sizes" placeholder="Available Sizes (Comma separated)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
                     <label class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer bg-slate-50">
                         <i class="fa-solid fa-camera text-xl text-slate-300 mb-1"></i>
                         <span class="text-[9px] font-bold uppercase text-slate-400">Add Photo</span>
@@ -159,14 +161,14 @@
         <div id="cart-items" class="max-h-40 overflow-y-auto mb-4 space-y-3 text-[11px] no-scrollbar px-1"></div>
         <div class="border-t border-slate-700 pt-4 flex justify-between items-center px-2">
             <div><p class="text-[9px] opacity-40 uppercase font-bold mb-1">Total</p><p class="text-xl font-black" id="cart-total">₹0</p></div>
-            <button onclick="checkoutWA()" class="bg-moms-pink text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95">Checkout</button>
+            <button onclick="checkoutWA()" class="bg-moms-pink text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all">Order via WA</button>
         </div>
     </div>
 
     <nav class="fixed bottom-0 left-0 right-0 glass-nav border-t p-4 z-50">
         <div class="max-w-md mx-auto flex justify-around items-center text-slate-400">
             <button onclick="switchTab('admin')" id="nav-admin" class="flex flex-col items-center gap-1"><i class="fa-solid fa-sliders text-xl"></i><span class="text-[9px] font-bold uppercase">Admin</span></button>
-            <button onclick="copyLink()" class="flex flex-col items-center gap-1"><i class="fa-solid fa-share-nodes text-xl"></i><span class="text-[9px] font-bold uppercase">Share</span></button>
+            <button onclick="copyLink()" class="flex flex-col items-center gap-1"><i class="fa-solid fa-share-nodes text-xl"></i><span class="text-[9px] font-bold uppercase tracking-widest">Share</span></button>
         </div>
     </nav>
 
@@ -292,19 +294,45 @@
             const activeStoreItems = products.filter(p => p.is_active && p.name.toLowerCase().includes(storeSearch));
             const storeFiltered = currentFilter === 'All' ? activeStoreItems : activeStoreItems.filter(p => (p.category || 'Other') === currentFilter);
 
-            document.getElementById('store-grid').innerHTML = storeFiltered.map(p => `
+            document.getElementById('store-grid').innerHTML = storeFiltered.map(p => {
+                let sizeOptions = "";
+                if (p.sizes && p.sizes.trim() !== "") {
+                    const sizesArr = p.sizes.split(',');
+                    sizeOptions = `<select id="size-select-${p.id}" class="w-full mb-3 p-2 text-[9px] border rounded-xl bg-slate-50 uppercase font-black text-center">
+                        <option value="">Select Size</option>
+                        ${sizesArr.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('')}
+                    </select>`;
+                }
+
+                return `
                 <div class="bg-white rounded-[2.5rem] border overflow-hidden relative shadow-sm animate-pop">
                     <img src="${p.image_url}" class="w-full h-40 object-cover">
                     <div class="p-4 text-center">
                         <h3 class="font-black text-[9px] uppercase tracking-tighter mb-1 truncate px-2 text-slate-700">${p.name}</h3>
-                        <p class="moms-pink font-black text-xs mb-1">₹${p.price}</p>
-                        <p class="text-[8px] text-slate-400 uppercase font-bold mb-3">${p.sizes || 'Free Size'}</p>
+                        <p class="moms-pink font-black text-xs mb-3">₹${p.price}</p>
+                        ${sizeOptions}
                         <button onclick="addToBag('${p.id}')" class="w-full bg-slate-900 text-white py-2.5 rounded-2xl text-[8px] font-black uppercase tracking-widest active:scale-95 transition-all">Add to bag</button>
                     </div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
         }
 
-        function addToBag(id) { cart.push(products.find(i => i.id === id)); updateCartUI(); }
+        function addToBag(id) {
+            const p = products.find(i => i.id === id);
+            const sizeDropdown = document.getElementById(`size-select-${id}`);
+            let selectedSize = "";
+
+            if (sizeDropdown) {
+                selectedSize = sizeDropdown.value;
+                if (!selectedSize) {
+                    alert("Please select a size first! 🎀");
+                    return;
+                }
+            }
+
+            cart.push({ ...p, chosenSize: selectedSize });
+            updateCartUI();
+        }
 
         function updateCartUI() {
             const dr = document.getElementById('cart-drawer');
@@ -313,7 +341,11 @@
             let total = cart.reduce((acc, i) => acc + i.price, 0);
             document.getElementById('cart-items').innerHTML = cart.map((i, idx) => `
                 <div class="flex justify-between items-center text-white">
-                    <span>${i.name}</span><button onclick="cart.splice(${idx},1); updateCartUI()" class="text-pink-500 font-bold p-1">Remove</button>
+                    <div class="flex flex-col">
+                        <span class="font-bold">${i.name}</span>
+                        ${i.chosenSize ? `<span class="text-[8px] opacity-60 uppercase tracking-widest">Size: ${i.chosenSize}</span>` : ''}
+                    </div>
+                    <button onclick="cart.splice(${idx},1); updateCartUI()" class="text-pink-500 font-bold p-1">Remove</button>
                 </div>`).join('');
             document.getElementById('cart-total').innerText = `₹${total}`;
         }
@@ -321,7 +353,9 @@
         function checkoutWA() {
             let total = cart.reduce((acc, i) => acc + i.price, 0);
             let msg = `🛍️ *MOMS WORLD ORDER*\n━━━━━━━━━━━━━━━\n`;
-            cart.forEach(i => msg += `• ${i.name} - ₹${i.price}\n`);
+            cart.forEach(i => {
+                msg += `• ${i.name} ${i.chosenSize ? `[Size: ${i.chosenSize}]` : ''} - ₹${i.price}\n`;
+            });
             msg += `━━━━━━━━━━━━━━━\n💰 *Total: ₹${total}*`;
             window.open(`https://wa.me/${MY_NUM}?text=${encodeURIComponent(msg)}`);
         }
